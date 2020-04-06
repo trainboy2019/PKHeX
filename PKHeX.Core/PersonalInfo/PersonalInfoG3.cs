@@ -7,15 +7,12 @@ namespace PKHeX.Core
     /// </summary>
     public class PersonalInfoG3 : PersonalInfo
     {
-        protected PersonalInfoG3() { }
         public const int SIZE = 0x1C;
-        public PersonalInfoG3(byte[] data)
-        {
-            if (data.Length != SIZE)
-                return;
 
-            Data = data;
+        public PersonalInfoG3(byte[] data) : base(data)
+        {
         }
+
         public override byte[] Write() => Data;
 
         public override int HP { get => Data[0x00]; set => Data[0x00] = (byte)value; }
@@ -46,7 +43,7 @@ namespace PKHeX.Core
         public int Ability1 { get => Data[0x16]; set => Data[0x16] = (byte)value; }
         public int Ability2 { get => Data[0x17]; set => Data[0x17] = (byte)value; }
         public override int EscapeRate { get => Data[0x18]; set => Data[0x18] = (byte)value; }
-        public override int Color { get => Data[0x19] & 0x7F; set => Data[0x19] = (byte)(Data[0x19] & 0x80 | value); }
+        public override int Color { get => Data[0x19] & 0x7F; set => Data[0x19] = (byte)((Data[0x19] & 0x80) | value); }
         public bool NoFlip { get => Data[0x19] >> 7 == 1; set => Data[0x19] = (byte)(Color | (value ? 0x80 : 0)); }
 
         public override int[] Items
@@ -54,20 +51,23 @@ namespace PKHeX.Core
             get => new[] { Item1, Item2 };
             set
             {
-                if (value?.Length != 2) return;
+                if (value.Length != 2) return;
                 Item1 = value[0];
                 Item2 = value[1];
             }
         }
+
         public override int[] Abilities
         {
             get => new[] { Ability1, Ability2 };
             set
             {
-                if (value?.Length != 2) return;
+                if (value.Length != 2) return;
                 Ability1 = (byte)value[0];
                 Ability2 = (byte)value[1];
             }
         }
+
+        public bool HasSecondAbility => Ability1 != Ability2;
     }
 }
